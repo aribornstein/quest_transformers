@@ -30,17 +30,25 @@
 
 <body>
   <h1>Hugging Face Transformers Demo</h1>
-  <button id="runBtn">Generate Text</button>
+  <p id="modelStatus">Loading model...</p>
+  <button id="runBtn" disabled>Generate Text</button>
   <div id="output">Output will appear here...</div>
   <script type="module">
     import { pipeline, TextStreamer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0';
 
+    const modelStatus = document.getElementById('modelStatus');
+    const runBtn = document.getElementById('runBtn');
+
+    
     // Create a text generation pipeline with desired configuration.
     const generator = await pipeline(
       "text-generation",
       "onnx-community/Qwen2.5-0.5B-Instruct",
       { dtype: "q4", device: "webgpu" }
     );
+
+    modelStatus.textContent = 'Model loaded!';
+    runBtn.disabled = false;
 
     async function runGeneration() {
 
