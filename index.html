@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Hugging Face Text Generation Demo</title>
@@ -8,6 +9,7 @@
       font-family: Arial, sans-serif;
       margin: 2rem;
     }
+
     #output {
       white-space: pre-wrap;
       background: #f9f9f9;
@@ -25,6 +27,7 @@
     }
   </script>
 </head>
+
 <body>
   <h1>Hugging Face Transformers Demo</h1>
   <p id="modelStatus">Loading model...</p>
@@ -38,11 +41,13 @@
     const runBtn = document.getElementById('runBtn');
 
     // Create a text generation pipeline with desired configuration.
+    const device = navigator.gpu ? "webgpu" : "cpu";
     const generator = await pipeline(
       "text-generation",
       "onnx-community/Qwen2.5-0.5B-Instruct",
-      { dtype: "q4", device: "webgpu" }
+      { dtype: "q4", device }
     );
+
 
     modelStatus.textContent = 'Model loaded!';
     runBtn.disabled = false;
@@ -84,7 +89,7 @@
         no_repeat_ngram_size: 3,
         num_beams: 2,
         num_return_sequences: 1,
-        stop: [".", "!", "?"], 
+        stop: [".", "!", "?"],
         streamer
       });
 
@@ -94,4 +99,5 @@
     document.getElementById('runBtn').addEventListener('click', runGeneration);
   </script>
 </body>
+
 </html>
