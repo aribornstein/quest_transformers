@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <title>Hugging Face Text Generation Demo</title>
@@ -9,7 +8,6 @@
       font-family: Arial, sans-serif;
       margin: 2rem;
     }
-
     #output {
       white-space: pre-wrap;
       background: #f9f9f9;
@@ -27,19 +25,18 @@
     }
   </script>
 </head>
-
 <body>
   <h1>Hugging Face Transformers Demo</h1>
   <p id="modelStatus">Loading model...</p>
   <button id="runBtn" disabled>Generate Text</button>
   <div id="output">Output will appear here...</div>
   <script type="module">
-    import { pipeline, TextStreamer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0';
+    // Import the local modified version (without the source map reference)
+    import { pipeline, TextStreamer } from 'transformers.min.js';
 
     const modelStatus = document.getElementById('modelStatus');
     const runBtn = document.getElementById('runBtn');
 
-    
     // Create a text generation pipeline with desired configuration.
     const generator = await pipeline(
       "text-generation",
@@ -51,8 +48,6 @@
     runBtn.disabled = false;
 
     async function runGeneration() {
-
-      // Define the conversation messages.
       const messages = [
         { role: "system", content: "You are a helpful assistant that tells jokes. You MUST only tell one joke and then stop." },
         { role: "user", content: "Tell me one funny joke and then stop." }
@@ -61,27 +56,22 @@
       const outputElement = document.getElementById('output');
       outputElement.textContent = '';
 
-      // Create a text streamer with a callback function.
       const streamer = new TextStreamer(generator.tokenizer, {
         skip_prompt: true,
         callback_function: (text) => {
-          // Post-processing to truncate the output
-          let generatedText = text; // Use the incoming text from the streamer
+          let generatedText = text;
           const stopPhrases = ["That's all!", "End of joke.", "\n\n"];
           for (const phrase of stopPhrases) {
             const index = generatedText.indexOf(phrase);
             if (index !== -1) {
               generatedText = generatedText.substring(0, index + phrase.length);
-              break; // Stop after the first match
+              break;
             }
           }
-
-          // Append each new token (or word) as soon as it's available.
           outputElement.textContent += generatedText;
         }
       });
 
-      // Generate the response passing the streamer.
       const result = await generator(messages, {
         max_new_tokens: 25,
         do_sample: true,
@@ -94,7 +84,7 @@
         no_repeat_ngram_size: 3,
         num_beams: 2,
         num_return_sequences: 1,
-        stop: [".", "!", "?"], // Focus on basic punctuation
+        stop: [".", "!", "?"], 
         streamer
       });
 
@@ -104,5 +94,4 @@
     document.getElementById('runBtn').addEventListener('click', runGeneration);
   </script>
 </body>
-
 </html>
