@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <title>Hugging Face Text Generation Demo</title>
@@ -9,7 +8,6 @@
       font-family: Arial, sans-serif;
       margin: 2rem;
     }
-
     #output {
       white-space: pre-wrap;
       background: #f9f9f9;
@@ -27,27 +25,32 @@
     }
   </script>
 </head>
-
 <body>
   <h1>Hugging Face Transformers Demo</h1>
   <p id="modelStatus">Loading model...</p>
   <button id="runBtn" disabled>Generate Text</button>
   <div id="output">Output will appear here...</div>
   <script type="module">
-    // Import the local modified version (without the source map reference)
+    // First, import onnxruntime-web to configure the WASM path.
+    import * as ort from 'onnxruntime-web';
+    // Set the path to the onnxruntime-web WASM binaries.
+    ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
+
+    // Then import the transformers pipeline and TextStreamer.
     import { pipeline, TextStreamer } from './transformers.min.js';
 
     const modelStatus = document.getElementById('modelStatus');
     const runBtn = document.getElementById('runBtn');
 
-    // Create a text generation pipeline with desired configuration.
+    // Fallback to "cpu" when WebGPU is not available (Safari currently lacks WebGPU)
     const device = navigator.gpu ? "webgpu" : "cpu";
+
+    // Initialize the text generation pipeline.
     const generator = await pipeline(
       "text-generation",
       "onnx-community/Qwen2.5-0.5B-Instruct",
       { dtype: "q4", device }
     );
-
 
     modelStatus.textContent = 'Model loaded!';
     runBtn.disabled = false;
@@ -99,5 +102,4 @@
     document.getElementById('runBtn').addEventListener('click', runGeneration);
   </script>
 </body>
-
 </html>
